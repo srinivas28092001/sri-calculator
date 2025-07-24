@@ -1,0 +1,48 @@
+import cv2
+
+def get_color_name(R,G,B):
+    if R>200 and G<50 and B<50:
+        return "Red"
+    elif G>200 and R<50 and B<50:
+        return "Green"
+    elif R>200 and G>200 and B<50:
+        return "Yellow"
+    elif R<50 and G>200 and B>200:
+        return "Cyan"
+    elif R>200 and G<50 and B>200:
+        return "Magenta"
+    elif R>200 and G>200 and B>200:
+        return "Blue"
+    elif R<50 and G<50 and B<50:
+        return "Black"
+    else:
+        return "Unknown"
+
+def show_color(event,x,y,flags,param):
+    global clicked,r,g,b,xpos,ypos
+    if event == cv2.EVENT_LBUTTONDOWN:
+        clicked=True
+        xpos,ypos=x,y
+        b,g,r=frame[y,x]
+        b,g,r=(int(b),int(g),int(r))
+
+cap=cv2.VideoCapture(0)
+cv2.namedWindow("Color Detection")
+cv2.setMouseCallback("Color Detection",show_color)
+clicked=False
+r=g=b=xpos=ypos=0
+
+while True:
+    ret,frame=cap.read()
+    if clicked:
+        cv2.rectangle(frame,(20,20),(300,60),(b,g,r),-1)
+        color_name=get_color_name(r,g,b)
+        text=f"{color_name} R={r} G={g} B={b}"
+        cv2.putText(frame,text,(20,50),2,0.8,(255,255,255) if r+g+b <600 else (0,0,0),2)
+
+    cv2.imshow("Color Detection",frame)
+    if cv2.waitKey(1) == ord("q"):
+        break
+
+cap.release()
+cv2.destroyAllWindows()
