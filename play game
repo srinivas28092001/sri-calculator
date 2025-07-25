@@ -1,0 +1,56 @@
+import random
+
+def get_player_choice():
+    """Gets the player's choice and validates it."""
+    while True:
+        choice = input("Enter your choice (rock, paper, scissors, lizard, spock): ").lower()
+        if choice in ["rock", "paper", "scissors", "lizard", "spock"]:
+            return choice
+        else:
+            print("Invalid choice. Please choose from rock, paper, scissors, lizard, or spock.")
+
+def get_computer_choice():
+    """Generates a random choice for the computer."""
+    choices = ["rock", "paper", "scissors", "lizard", "spock"]
+    return random.choice(choices)
+
+def determine_winner(player_choice, computer_choice):
+    """Determines the winner based on the game rules."""
+    rules = {
+        "rock": ["scissors", "lizard"],
+        "paper": ["rock", "spock"],
+        "scissors": ["paper", "lizard"],
+        "lizard": ["spock", "paper"],
+        "spock": ["scissors", "rock"]
+    }
+
+    if player_choice == computer_choice:
+        return "It's a tie!"
+    elif computer_choice in rules[player_choice]:
+        return "You win!"
+    else:
+        return "Computer wins!"
+
+def play_game():
+    """Runs a single round of the game."""
+    player_choice = get_player_choice()
+    computer_choice = get_computer_choice()
+
+    print(f"\nYou chose: {player_choice}")
+    print(f"Computer chose: {computer_choice}")
+
+    result = determine_winner(player_choice, computer_choice)
+    print(result)
+
+# Main game loop
+if __name__ == "__main__":
+    while True:
+        play_game()
+        play_again = input("\nPlay again? (yes/no): ").lower()
+        if play_again != "yes":
+            print("Thanks for playing!")
+            break
+
+
+
+
