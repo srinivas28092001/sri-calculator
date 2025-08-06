@@ -1,0 +1,29 @@
+from django.shortcuts import render, redirect
+from django.http import HttpResponse
+
+# Dummy user data for demonstration
+USERS = {
+    "user1": "pass123",
+    "user2": "password456",
+}
+
+def home_view(request):
+    username = request.session.get('username')
+    return render(request, 'home.html', {'username': username})
+
+def login_view(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+
+        if username in USERS and USERS[username] == password:
+            request.session['username'] = username
+            return redirect('home')
+        else:
+            return render(request, 'login.html', {'error': 'Invalid credentials'})
+    return render(request, 'login.html')
+
+def logout_view(request):
+    if 'username' in request.session:
+        del request.session['username']
+return redirect('home')
