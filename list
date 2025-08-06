@@ -1,0 +1,72 @@
+boolean_true = True
+print(boolean_true)
+
+# Create a variable with the value False and print it.
+boolean_false = False
+print(boolean_false)
+
+# Check if 10 is greater than 5 using a Boolean expression and print the result.
+print(10 > 5)
+
+# Check if 3 is equal to 3 using a Boolean expression and print the result.
+print(3 == 3)
+
+# Check if a number is greater than 20 and print True or False.
+number_to_check = 25
+print(number_to_check > 20)
+
+# Check if a string is equal to "hello" and print True or False.
+string_to_check = "hello"
+print(string_to_check == "hello")
+
+# Check if 7 is not equal to 8 and print the result.
+print(7 != 8)
+
+# Use the and operator to check if both conditions are True (e.g., 5 > 3 and 4 < 7).
+print((5 > 3) and (4 < 7))
+
+# Use the or operator to check if at least one condition is True (e.g., 5 > 3 or 10 < 2).
+print((5 > 3) or (10 < 2))
+
+# Create a variable with an integer value 10 and print it.
+integer_variable = 10
+print(integer_variable)
+
+# Create a variable with a float value 3.14 and print it.
+float_variable = 3.14
+print(float_variable)
+
+# Add two numbers (e.g., 5 + 3) and print the result.
+print(5 + 3)
+
+# Subtract two numbers (e.g., 10 - 4) and print the result.
+print(10 - 4)
+
+# Multiply two numbers (e.g., 3 * 2) and print the result.
+print(3 * 2)
+
+# Divide two numbers (e.g., 9 / 3) and print the result.
+print(9 / 3)
+
+# Create two variables (one integer and one float) and add them together. Print the result.
+int_var = 7
+float_var_add = 2.5
+print(int_var + float_var_add)
+
+# Create a list of 3 numbers (e.g., 1, 2, 3) and print it.
+number_list = [1, 2, 3]
+print(number_list)
+
+# Create a list of 3 strings (e.g., ["apple", "banana", "cherry"]) and print it.
+string_list = ["apple", "banana", "cherry"]
+print(string_list)
+
+# Print the first item of a list.
+print(number_list[0])
+
+# Print the last item of a list.
+print(string_list[-1])
+
+# Add an item to the end of the list using append.
+number_list.append(4)
+print(number_list)
