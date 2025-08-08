@@ -1,0 +1,161 @@
+import sqlite3
+import tkinter as tk
+from tkinter import ttk, messagebox
+
+# -------------------- Database Setup --------------------
+def init_db():
+    conn = sqlite3.connect("library.db")
+    c = conn.cursor()
+    c.execute("""
+        CREATE TABLE IF NOT EXISTS books (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT NOT NULL,
+            author TEXT NOT NULL,
+            available INTEGER DEFAULT 1
+        )
+    """)
+    conn.commit()
+    conn.close()
+
+# -------------------- Functions --------------------
+def add_book():
+    title = entry_title.get().strip()
+    author = entry_author.get().strip()
+    if not title or not author:
+        messagebox.showwarning("Input Error", "Please enter both Title and Author.")
+        return
+    conn = sqlite3.connect("library.db")
+    c = conn.cursor()
+    c.execute("INSERT INTO books (title, author, available) VALUES (?, ?, 1)", (title, author))
+    conn.commit()
+    conn.close()
+    entry_title.delete(0, tk.END)
+    entry_author.delete(0, tk.END)
+    load_books()
+
+def delete_book():
+    selected = tree.selection()
+    if not selected:
+        messagebox.showwarning("Selection Error", "Please select a book to delete.")
+        return
+    book_id = tree.item(selected[0])['values'][0]
+    conn = sqlite3.connect("library.db")
+    c = conn.cursor()
+    c.execute("DELETE FROM books WHERE id=?", (book_id,))
+    conn.commit()
+    conn.close()
+    load_books()
+
+def borrow_book():
+    selected = tree.selection()
+    if not selected:
+        messagebox.showwarning("Selection Error", "Please select a book to borrow.")
+        return
+    book_id, title, author, available = tree.item(selected[0])['values']
+    if available == "No":
+        messagebox.showinfo("Unavailable", f"'{title}' is already borrowed.")
+        return
+    conn = sqlite3.connect("library.db")
+    c = conn.cursor()
+    c.execute("UPDATE books SET available=0 WHERE id=?", (book_id,))
+    conn.commit()
+    conn.close()
+    load_books()
+
+def return_book():
+    selected = tree.selection()
+    if not selected:
+        messagebox.showwarning("Selection Error", "Please select a book to return.")
+        return
+    book_id, title, author, available = tree.item(selected[0])['values']
+    if available == "Yes":
+        messagebox.showinfo("Info", f"'{title}' is already available.")
+        return
+    conn = sqlite3.connect("library.db")
+    c = conn.cursor()
+    c.execute("UPDATE books SET available=1 WHERE id=?", (book_id,))
+    conn.commit()
+    conn.close()
+    load_books()
+
+def search_books():
+    search_term = entry_search.get().strip()
+    conn = sqlite3.connect("library.db")
+    c = conn.cursor()
+    c.execute("SELECT * FROM books WHERE title LIKE ? OR author LIKE ?",
+              (f"%{search_term}%", f"%{search_term}%"))
+    rows = c.fetchall()
+    conn.close()
+    update_tree(rows)
+
+def load_books():
+    conn = sqlite3.connect("library.db")
+    c = conn.cursor()
+    c.execute("SELECT * FROM books")
+    rows = c.fetchall()
+    conn.close()
+    update_tree(rows)
+
+def update_tree(rows):
+    tree.delete(*tree.get_children())
+    for row in rows:
+        tree.insert("", tk.END, values=(row[0], row[1], row[2], "Yes" if row[3] == 1 else "No"))
+
+# -------------------- GUI Setup --------------------
+root = tk.Tk()
+root.title("📚 Library Book Management System")
+root.geometry("750x500")
+root.resizable(False, False)
+
+# Frame for Adding Books
+frame_add = tk.LabelFrame(root, text="Add Book", padx=10, pady=10)
+frame_add.pack(fill="x", padx=10, pady=5)
+
+tk.Label(frame_add, text="Title:").grid(row=0, column=0, padx=5, pady=5)
+entry_title = tk.Entry(frame_add)
+entry_title.grid(row=0, column=1, padx=5, pady=5)
+
+tk.Label(frame_add, text="Author:").grid(row=0, column=2, padx=5, pady=5)
+entry_author = tk.Entry(frame_add)
+entry_author.grid(row=0, column=3, padx=5, pady=5)
+
+tk.Button(frame_add, text="Add", command=add_book).grid(row=0, column=4, padx=5, pady=5)
+
+# Search Frame
+frame_search = tk.LabelFrame(root, text="Search", padx=10, pady=10)
+frame_search.pack(fill="x", padx=10, pady=5)
+
+entry_search = tk.Entry(frame_search)
+entry_search.pack(side=tk.LEFT, padx=5)
+tk.Button(frame_search, text="Search", command=search_books).pack(side=tk.LEFT, padx=5)
+tk.Button(frame_search, text="Show All", command=load_books).pack(side=tk.LEFT, padx=5)
+
+# Treeview (Table) with Headings
+columns = ("ID", "Title", "Author", "Available")
+tree = ttk.Treeview(root, columns=columns, show="headings", height=12)
+
+tree.heading("ID", text="Book ID")
+tree.heading("Title", text="Title")
+tree.heading("Author", text="Author")
+tree.heading("Available", text="Available")
+
+tree.column("ID", width=80, anchor="center")
+tree.column("Title", width=220, anchor="w")
+tree.column("Author", width=200, anchor="w")
+tree.column("Available", width=100, anchor="center")
+
+tree.pack(pady=10)
+
+# Action Buttons
+frame_actions = tk.Frame(root)
+frame_actions.pack(fill="x", padx=10, pady=5)
+
+tk.Button(frame_actions, text="Borrow", command=borrow_book).pack(side=tk.LEFT, padx=5)
+tk.Button(frame_actions, text="Return", command=return_book).pack(side=tk.LEFT, padx=5)
+tk.Button(frame_actions, text="Delete", command=delete_book).pack(side=tk.LEFT, padx=5)
+
+# Initialize
+init_db()
+load_books()
+
+root.mainloop()
